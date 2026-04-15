@@ -1,73 +1,134 @@
-```md
 # AI Agents Documentation
 
-## Purpose
+## 🤖 Overview
 
-This project supports extension using AI agents for faster development and automation.
+This project supports the use of AI agents to assist in development, automation, optimization, and future scalability of the Vibecoding AI Tools Platform.
 
----
-
-## 🤖 Agent Types
-
-### Backend Agent
-Handles:
-- Laravel API
-- Controllers
-- Migrations
-- Middleware
-- Security
-- Admin panel
+The goal is to enable structured collaboration between developers and AI systems.
 
 ---
 
-### Frontend Agent
-Handles:
-- Next.js UI
-- Tailwind styling
-- Responsive design
-- Forms and UX
+## 🧠 Agent Architecture
+
+The system is designed to be extendable with multiple specialized agents:
 
 ---
 
-### Security Agent
-Handles:
-- Authentication
-- Role-based access
-- 2FA logic
-- Token security
+## 🔧 Backend Agent
+
+### Responsibilities:
+
+* Laravel API development
+* Controllers and business logic
+* Database migrations and relationships
+* Middleware and authorization
+* Performance optimization (queries, pagination)
+* Admin panel logic
+
+### Example prompts:
+
+* "Create a Laravel API endpoint with validation and authorization"
+* "Optimize Eloquent queries with eager loading"
+* "Add pagination to improve performance"
 
 ---
 
-### Documentation Agent
-Handles:
-- README updates
-- API documentation
-- Usage instructions
+## 🎨 Frontend Agent
+
+### Responsibilities:
+
+* Next.js components and pages
+* Tailwind CSS UI design
+* Responsive layouts
+* Form handling and validation
+* UX improvements
+
+### Example prompts:
+
+* "Refactor React component to use context instead of props"
+* "Improve dashboard UI with Tailwind"
+* "Make the layout mobile responsive"
 
 ---
 
-## 🧠 Example Prompts
+## 🔐 Security Agent
 
-### Backend Agent
-Improve Laravel API structure, add secure routes, optimize queries and implement clean architecture.
+### Responsibilities:
 
----
+* Authentication flow (Sanctum)
+* Token management
+* Role-based access control
+* Route protection
+* Two-Factor Authentication (2FA)
 
-### Frontend Agent
-Improve UI/UX, create responsive layouts and enhance user interaction with clean design.
+### Example prompts:
 
----
-
-### Security Agent
-Analyze system security, improve authentication flow, validate tokens and enhance 2FA protection.
-
----
-
-### Documentation Agent
-Write clear documentation for setup, usage and architecture of the project.
+* "Ensure only tool owner can edit or delete"
+* "Audit API routes for authorization issues"
+* "Improve token validation and security"
 
 ---
 
-## 🚀 Development Prompt
+## 📄 Documentation Agent
 
-Continue improving the Vibecoding AI Tools Platform with focus on scalability, security and user experience.
+### Responsibilities:
+
+* Maintain README
+* Generate API documentation
+* Provide onboarding instructions
+* Keep project documentation up-to-date
+
+### Example prompts:
+
+* "Generate README with installation steps"
+* "Document API endpoints"
+* "Explain project architecture"
+
+---
+
+## 🚀 Development Agent (General Purpose)
+
+### Responsibilities:
+
+* Code generation
+* Refactoring
+* Bug fixing
+* Feature suggestions
+
+### Example prompts:
+
+* "Refactor this code to follow best practices"
+* "Fix bug in API request handling"
+* "Suggest improvements for scalability"
+
+---
+
+## 🔮 Future AI Extensions
+
+Potential improvements using AI:
+
+* Auto-tagging tools using NLP
+* AI-generated tool descriptions
+* Smart recommendations based on user behavior
+* Automated moderation system for tools
+* AI-powered search and filtering
+
+---
+
+## ⚙️ Development Prompt
+
+Use the following prompt to continue development:
+
+"Continue improving the Vibecoding AI Tools Platform with focus on scalability, security, performance and user experience. Follow best practices for Laravel and Next.js."
+
+---
+
+## 📌 Notes
+
+All agents should follow:
+
+* Clean code principles
+* SOLID architecture
+* Laravel & React best practices
+* Secure development standards
+* Scalable design patterns
