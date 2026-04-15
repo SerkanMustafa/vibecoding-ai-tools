@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { API_BASE } from '@/lib/api';
 
 type Option = {
   id: number;
@@ -43,7 +44,7 @@ export default function ToolCard({
 
       setLoadingComments(true);
 
-      const res = await fetch(`http://localhost:8201/api/tools/${tool.id}/comments`, {
+      const res = await fetch(`${API_BASE}/tools/${tool.id}/comments`, {
         headers: {
           Accept: 'application/json',
           Authorization: `Bearer ${token}`,
@@ -83,7 +84,7 @@ export default function ToolCard({
       setCommentError('');
       setCommentMessage('');
 
-      const res = await fetch(`http://localhost:8201/api/tools/${tool.id}/comments`, {
+      const res = await fetch(`${API_BASE}/tools/${tool.id}/comments`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',

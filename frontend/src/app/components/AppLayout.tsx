@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 export default function AppLayout({
   children,
@@ -9,6 +10,7 @@ export default function AppLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { user, loading, logout } = useAuth();
 
   const menu = [
     { name: 'Dashboard', href: '/' },
@@ -67,10 +69,17 @@ export default function AppLayout({
 
               <div className="flex items-center gap-4">
                 <span className="hidden text-sm text-slate-600 sm:inline">
-                  Logged user
+                  {loading
+                    ? 'Loading user...'
+                    : user
+                    ? `${user.name} (${user.role})`
+                    : 'Guest'}
                 </span>
 
-                <button className="rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white transition hover:bg-indigo-700">
+                <button
+                  onClick={logout}
+                  className="rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white transition hover:bg-indigo-700"
+                >
                   Logout
                 </button>
               </div>

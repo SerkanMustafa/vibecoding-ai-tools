@@ -1,6 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { API_BASE } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
 
 type Option = {
   id: number;
@@ -28,8 +30,6 @@ type Tool = {
   } | null;
 };
 
-const API_BASE = 'http://localhost:8201/api';
-
 const inputClassName =
   'w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100';
 
@@ -39,7 +39,8 @@ const primaryButtonClassName =
   'inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60';
 
 export default function AdminToolsPage() {
-  const [token, setToken] = useState('');
+  const { token, setToken } = useAuth();
+
   const [tools, setTools] = useState<Tool[]>([]);
   const [roles, setRoles] = useState<Option[]>([]);
   const [categories, setCategories] = useState<Option[]>([]);
@@ -104,7 +105,7 @@ export default function AdminToolsPage() {
       }
 
       const data = await res.json();
-      setTools(data);
+      setTools(data.data || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.');
     } finally {

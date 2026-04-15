@@ -34,7 +34,9 @@ class AiToolController extends Controller
             });
         }
 
-        return response()->json($query->latest()->get());
+        return response()->json(
+            $query->latest()->paginate(10)
+        );
     }
 
     public function store(Request $request)
@@ -89,6 +91,15 @@ class AiToolController extends Controller
 
     public function update(Request $request, AiTool $aiTool)
     {
+        if (
+            $request->user()->role !== 'owner' &&
+            $aiTool->created_by_user_id !== $request->user()->id
+        ) {
+            return response()->json([
+                'message' => 'Forbidden. You can only edit your own tools.',
+            ], 403);
+        }
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'url' => ['required', 'url'],
@@ -128,8 +139,17 @@ class AiToolController extends Controller
         );
     }
 
-    public function destroy(AiTool $aiTool)
+    public function destroy(Request $request, AiTool $aiTool)
     {
+        if (
+            $request->user()->role !== 'owner' &&
+            $aiTool->created_by_user_id !== $request->user()->id
+        ) {
+            return response()->json([
+                'message' => 'Forbidden. You can only delete your own tools.',
+            ], 403);
+        }
+
         $aiTool->delete();
 
         return response()->json([

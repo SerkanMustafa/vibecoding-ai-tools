@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import ToolCard from '../components/ToolCard';
+import { API_BASE } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
 
 type Option = {
   id: number;
@@ -25,10 +27,8 @@ type Tool = {
   };
 };
 
-const API_BASE = 'http://localhost:8201/api';
-
 export default function ToolsPage() {
-  const [token, setToken] = useState('');
+  const { token, setToken } = useAuth();
   const [tools, setTools] = useState<Tool[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -46,7 +46,7 @@ export default function ToolsPage() {
       });
 
       const data = await res.json();
-      setTools(data);
+      setTools(data.data || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -57,24 +57,26 @@ export default function ToolsPage() {
   const handleDelete = async (id: number) => {
     if (!confirm('Delete this tool?')) return;
 
-    await fetch(`${API_BASE}/tools/${id}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    try {
+      await fetch(`${API_BASE}/tools/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json',
+        },
+      });
 
-    fetchTools();
+      fetchTools();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
     <main className="min-h-screen bg-slate-50">
       <div className="mx-auto max-w-6xl px-4 py-6">
-        <h1 className="mb-6 text-3xl font-bold text-slate-900">
-          AI Tools
-        </h1>
+        <h1 className="mb-6 text-3xl font-bold text-slate-900">AI Tools</h1>
 
-        {/* TOKEN INPUT */}
         <div className="mb-6 rounded-xl bg-white p-4 shadow">
           <input
             placeholder="Paste token here..."
@@ -91,18 +93,17 @@ export default function ToolsPage() {
           </button>
         </div>
 
-        {/* TOOLS */}
         {loading && <p>Loading...</p>}
 
         <div className="grid gap-4">
           {tools.map((tool) => (
-              <ToolCard
-                key={tool.id}
-                tool={tool}
-                onDelete={handleDelete}
-                token={token}   // 🔥 ВАЖНО
-              />
-            ))}
+            <ToolCard
+              key={tool.id}
+              tool={tool}
+              onDelete={handleDelete}
+              token={token}
+            />
+          ))}
         </div>
       </div>
     </main>

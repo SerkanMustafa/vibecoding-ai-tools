@@ -1,23 +1,98 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { API_BASE } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
+
+type Option = {
+  id: number;
+  name: string;
+  slug?: string;
+};
+
+type Tool = {
+  id: number;
+  is_featured: boolean;
+};
+
 export default function DashboardPage() {
+  const { token, setToken } = useAuth();
+
+  const [tools, setTools] = useState<Tool[]>([]);
+  const [categories, setCategories] = useState<Option[]>([]);
+  const [roles, setRoles] = useState<Option[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchDashboardData = async () => {
+    if (!token.trim()) return;
+
+    try {
+      setLoading(true);
+
+      const [toolsRes, categoriesRes, rolesRes] = await Promise.all([
+        fetch(`${API_BASE}/tools`, {
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }),
+        fetch(`${API_BASE}/categories`, {
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }),
+        fetch(`${API_BASE}/roles`, {
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }),
+      ]);
+
+      if (!toolsRes.ok || !categoriesRes.ok || !rolesRes.ok) {
+        throw new Error('Failed to load dashboard data.');
+      }
+
+      const [toolsData, categoriesData, rolesData] = await Promise.all([
+        toolsRes.json(),
+        categoriesRes.json(),
+        rolesRes.json(),
+      ]);
+
+      setTools(toolsData.data || []);
+      setCategories(categoriesData || []);
+      setRoles(rolesData || []);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [token]);
+
   const stats = [
     {
       title: 'Total Tools',
-      value: '24',
+      value: String(tools.length),
       description: 'All tools currently in the system',
     },
     {
       title: 'Featured Tools',
-      value: '8',
+      value: String(tools.filter((tool) => tool.is_featured).length),
       description: 'Highlighted tools for quick discovery',
     },
     {
       title: 'Categories',
-      value: '6',
+      value: String(categories.length),
       description: 'Tool groups available for filtering',
     },
     {
       title: 'Roles',
-      value: '5',
+      value: String(roles.length),
       description: 'User roles connected to tools',
     },
   ];
@@ -25,6 +100,29 @@ export default function DashboardPage() {
   return (
     <main className="min-h-screen bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-3 md:flex-row md:items-end">
+            <div className="flex-1">
+              <label className="mb-2 block text-sm font-semibold text-slate-700">
+                Sanctum Token
+              </label>
+              <input
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                placeholder="Paste token here..."
+                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+              />
+            </div>
+
+            <button
+              onClick={fetchDashboardData}
+              className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700"
+            >
+              Load Dashboard Data
+            </button>
+          </div>
+        </div>
+
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-slate-900">
@@ -42,6 +140,10 @@ export default function DashboardPage() {
             + Add New Tool
           </a>
         </div>
+
+        {loading && (
+          <p className="mb-4 text-sm text-slate-500">Loading dashboard data...</p>
+        )}
 
         <section className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {stats.map((stat) => (

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-
-const API_BASE = 'http://localhost:8201/api';
+import { API_BASE } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
 
 const inputClassName =
   'w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100';
@@ -13,7 +13,8 @@ const primaryButtonClassName =
   'inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60';
 
 export default function ProfilePage() {
-  const [token, setToken] = useState('');
+  const { token, setToken, user } = useAuth();
+
   const [code, setCode] = useState('');
   const [qrUrl, setQrUrl] = useState('');
   const [secret, setSecret] = useState('');
@@ -97,6 +98,8 @@ export default function ProfilePage() {
     }
   };
 
+  const userInitial = user?.name ? user.name.charAt(0).toUpperCase() : 'U';
+
   return (
     <main className="min-h-screen bg-slate-50">
       <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
@@ -113,18 +116,18 @@ export default function ProfilePage() {
           <aside className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex flex-col items-center text-center">
               <div className="flex h-20 w-20 items-center justify-center rounded-full bg-indigo-100 text-2xl font-bold text-indigo-700">
-                U
+                {userInitial}
               </div>
 
               <h2 className="mt-4 text-xl font-semibold text-slate-900">
-                Logged User
+                {user?.name || 'Guest'}
               </h2>
               <p className="mt-1 text-sm text-slate-500">
-                owner@example.com
+                {user?.email || 'No email available'}
               </p>
 
-              <span className="mt-3 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                Owner
+              <span className="mt-3 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold capitalize text-slate-700">
+                {user?.role || 'No role'}
               </span>
             </div>
           </aside>
@@ -139,21 +142,21 @@ export default function ProfilePage() {
                 <div className="rounded-xl bg-slate-50 p-4">
                   <p className="text-sm font-medium text-slate-500">Full Name</p>
                   <p className="mt-2 text-sm font-semibold text-slate-900">
-                    Logged User
+                    {user?.name || 'Guest'}
                   </p>
                 </div>
 
                 <div className="rounded-xl bg-slate-50 p-4">
                   <p className="text-sm font-medium text-slate-500">Email</p>
                   <p className="mt-2 text-sm font-semibold text-slate-900">
-                    owner@example.com
+                    {user?.email || 'No email available'}
                   </p>
                 </div>
 
                 <div className="rounded-xl bg-slate-50 p-4">
                   <p className="text-sm font-medium text-slate-500">Role</p>
-                  <p className="mt-2 text-sm font-semibold text-slate-900">
-                    Owner
+                  <p className="mt-2 text-sm font-semibold capitalize text-slate-900">
+                    {user?.role || 'No role'}
                   </p>
                 </div>
 
@@ -162,7 +165,7 @@ export default function ProfilePage() {
                     Account Status
                   </p>
                   <p className="mt-2 text-sm font-semibold text-emerald-700">
-                    Active
+                    {user ? 'Active' : 'Not authenticated'}
                   </p>
                 </div>
               </div>
