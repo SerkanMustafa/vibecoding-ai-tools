@@ -10,6 +10,30 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    public function register(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => 'user',
+        ]);
+
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        return response()->json([
+            'token' => $token,
+            'requires_2fa' => (bool) $user->two_factor_enabled,
+            'user' => $user,
+        ], 201);
+    }
+
     public function login(Request $request)
     {
         $validated = $request->validate([
@@ -27,18 +51,16 @@ class AuthController extends Controller
 
         $token = $user->createToken('api-token')->plainTextToken;
 
-       return response()->json([
-    'token' => $token,
-    'requires_2fa' => (bool) $user->two_factor_enabled,
-    'user' => $user,
-]);
+        return response()->json([
+            'token' => $token,
+            'requires_2fa' => (bool) $user->two_factor_enabled,
+            'user' => $user,
+        ]);
     }
 
     public function me(Request $request)
     {
-        return response()->json([
-            'user' => $request->user(),
-        ]);
+        return response()->json($request->user());
     }
 
     public function logout(Request $request)

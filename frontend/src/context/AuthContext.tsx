@@ -15,6 +15,13 @@ type AuthContextType = {
   user: User | null;
   loading: boolean;
   setToken: (token: string) => void;
+  login: (email: string, password: string) => Promise<void>;
+  register: (
+    name: string,
+    email: string,
+    password: string,
+    passwordConfirmation: string
+  ) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 };
@@ -55,18 +62,67 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (!res.ok) {
         logout();
-        setLoading(false);
         return;
       }
 
       const data = await res.json();
       setTokenState(savedToken);
       setUser(data);
-    } catch (error) {
+    } catch {
       logout();
     } finally {
       setLoading(false);
     }
+  };
+
+  const login = async (email: string, password: string) => {
+    const res = await fetch(`${API_BASE}/login`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      throw new Error(data?.message || 'Login failed.');
+    }
+
+    setToken(data.token);
+    setUser(data.user);
+  };
+
+  const register = async (
+    name: string,
+    email: string,
+    password: string,
+    passwordConfirmation: string
+  ) => {
+    const res = await fetch(`${API_BASE}/register`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        password,
+        password_confirmation: passwordConfirmation,
+      }),
+    });
+
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      throw new Error(data?.message || 'Registration failed.');
+    }
+
+    setToken(data.token);
+    setUser(data.user);
   };
 
   useEffect(() => {
@@ -80,6 +136,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         loading,
         setToken,
+        login,
+        register,
         logout,
         refreshUser,
       }}

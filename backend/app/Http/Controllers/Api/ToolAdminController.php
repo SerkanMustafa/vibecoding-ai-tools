@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\AiTool;
 use Illuminate\Http\Request;
-use App\Models\ActivityLog;
 
 class ToolAdminController extends Controller
 {
@@ -30,21 +30,21 @@ class ToolAdminController extends Controller
         }
 
         return response()->json(
-            $query->latest()->get()
+            $query->latest()->paginate(10)
         );
     }
 
-    public function approve(AiTool $tool)
+    public function approve(Request $request, AiTool $tool)
     {
-        ActivityLog::create([
-    'user_id' => auth()->id(),
-    'action' => 'approve',
-    'model_type' => 'tool',
-    'model_id' => $tool->id,
-]);
-        
         $tool->update([
             'status' => 'approved',
+        ]);
+
+        ActivityLog::create([
+            'user_id' => $request->user()->id,
+            'action' => 'approve',
+            'model_type' => AiTool::class,
+            'model_id' => $tool->id,
         ]);
 
         return response()->json([
@@ -53,16 +53,17 @@ class ToolAdminController extends Controller
         ]);
     }
 
-    public function reject(AiTool $tool)
+    public function reject(Request $request, AiTool $tool)
     {
-        ActivityLog::create([
-    'user_id' => auth()->id(),
-    'action' => 'approve',
-    'model_type' => 'tool',
-    'model_id' => $tool->id,
-]);
         $tool->update([
             'status' => 'rejected',
+        ]);
+
+        ActivityLog::create([
+            'user_id' => $request->user()->id,
+            'action' => 'reject',
+            'model_type' => AiTool::class,
+            'model_id' => $tool->id,
         ]);
 
         return response()->json([

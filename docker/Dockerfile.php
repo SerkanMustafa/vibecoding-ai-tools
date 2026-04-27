@@ -42,16 +42,17 @@ RUN addgroup -g 1000 laravel && adduser -u 1000 -G laravel -s /bin/sh -D laravel
 # Copy project-specific configurations
 COPY docker/php.ini /usr/local/etc/php/conf.d/project.ini
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY docker/php-entrypoint.sh /usr/local/bin/php-entrypoint.sh
+RUN chmod +x /usr/local/bin/php-entrypoint.sh
 
 # Set working directory and permissions
 WORKDIR /var/www/html
 RUN chown -R laravel:laravel /var/www
 
-# Switch to laravel user
-USER laravel
+# Keep root user for startup permission fix.
+# The entrypoint will fix mounted volume permissions, then start PHP-FPM.
+USER root
 
-# Expose PHP-FPM port
 EXPOSE 9000
 
-# Start PHP-FPM
-CMD ["php-fpm"]
+ENTRYPOINT ["php-entrypoint.sh"]

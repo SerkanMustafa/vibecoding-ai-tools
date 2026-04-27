@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 
 export default function AppLayout({
@@ -10,13 +10,17 @@ export default function AppLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, loading, logout } = useAuth();
+
+  const isAuthPage = pathname === '/login' || pathname === '/register';
 
   const menu = [
     { name: 'Dashboard', href: '/' },
     { name: 'Tools', href: '/tools' },
     { name: 'Add Tool', href: '/tools/create' },
     { name: 'Profile', href: '/profile' },
+    ...(user?.role === 'owner' ? [{ name: 'Admin', href: '/admin/tools' }] : []),
   ];
 
   const pageTitleMap: Record<string, string> = {
@@ -24,9 +28,21 @@ export default function AppLayout({
     '/tools': 'Tools',
     '/tools/create': 'Add Tool',
     '/profile': 'Profile',
+    '/admin/tools': 'Admin Panel',
+    '/login': 'Login',
+    '/register': 'Register',
   };
 
   const pageTitle = pageTitleMap[pathname] || 'Vibecoding';
+
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  };
+
+  if (isAuthPage) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen bg-slate-100">
@@ -76,12 +92,21 @@ export default function AppLayout({
                     : 'Guest'}
                 </span>
 
-                <button
-                  onClick={logout}
-                  className="rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white transition hover:bg-indigo-700"
-                >
-                  Logout
-                </button>
+                {user ? (
+                  <button
+                    onClick={handleLogout}
+                    className="rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white transition hover:bg-indigo-700"
+                  >
+                    Logout
+                  </button>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white transition hover:bg-indigo-700"
+                  >
+                    Login
+                  </Link>
+                )}
               </div>
             </div>
 

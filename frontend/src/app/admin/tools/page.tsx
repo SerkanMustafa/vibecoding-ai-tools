@@ -105,7 +105,7 @@ export default function AdminToolsPage() {
       }
 
       const data = await res.json();
-      setTools(data.data || []);
+setTools(data.data); // 🔥 ВАЖНО
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.');
     } finally {
